@@ -47,8 +47,10 @@ class HoriGroup  : ViewGroup  {
 
 
     interface onAnimationListener{
-        fun onSuccess()
+        fun onSuccess(state:Int)
     }
+
+    var mOnAnimationListener:onAnimationListener? = null
 
     constructor(context: Context):super(context){
 
@@ -91,8 +93,10 @@ class HoriGroup  : ViewGroup  {
         velovityTracker!!.addMovement(event)
         velovityTracker!!.computeCurrentVelocity(1000)
         var xVelocity = velovityTracker.getXVelocity()
+        var yVelocity = velovityTracker.getYVelocity()
 
-        dealWithXVelocity(xVelocity,null)
+        if(Math.abs(yVelocity) > Math.abs(xVelocity)) return false
+        dealWithXVelocity(xVelocity, mOnAnimationListener)
 
         return false
     }
@@ -131,7 +135,7 @@ class HoriGroup  : ViewGroup  {
             override fun onAnimationUpdate(animation: ValueAnimator?) {
                 var currentValue:Int = animation?.getAnimatedValue() as Int
 
-                if(currentValue == end ) l?.onSuccess()
+                if(currentValue == end ) l?.onSuccess(state)
 
                 val ex = v * currentValue
 
