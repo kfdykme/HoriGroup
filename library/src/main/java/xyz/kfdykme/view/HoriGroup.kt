@@ -90,14 +90,14 @@ class HoriGroup  : ViewGroup  {
 
         if(xVelocity <-slidingDistance){
             changeToCombine()
-
+            return true
         } else if(xVelocity > slidingDistance){
             changeToLeft()
-         //   return true
+            return true
         } else {
-         //   return false
+             return false
         }
-        return true
+        return false
     }
 
     public fun changeToLeft(){
