@@ -12,7 +12,7 @@ import android.view.ViewGroup
 /**
  * Created by wimkf on 2018/2/26.
  */
-class HoriGroup(context: Context?) : ViewGroup(context) {
+class HoriGroup  : ViewGroup  {
 
     val STATE_LEFT = 0
 
@@ -46,7 +46,11 @@ class HoriGroup(context: Context?) : ViewGroup(context) {
     var isUse:Boolean? = null
 
 
-    constructor(context: Context?, attributeSet: AttributeSet):this(context){
+    constructor(context: Context):super(context){
+
+    }
+
+    constructor(context: Context, attributeSet: AttributeSet):super(context,attributeSet){
 
 
     }
@@ -84,23 +88,26 @@ class HoriGroup(context: Context?) : ViewGroup(context) {
         velovityTracker!!.computeCurrentVelocity(1000)
         var xVelocity = velovityTracker.getXVelocity()
 
-        if(xVelocity<-slidingDistance)
+        if(xVelocity <-slidingDistance){
             changeToCombine()
-        else if(xVelocity> slidingDistance){
-            changeToLeft()
-        }
 
+        } else if(xVelocity > slidingDistance){
+            changeToLeft()
+         //   return true
+        } else {
+         //   return false
+        }
         return true
     }
 
-    private fun changeToLeft(){
+    public fun changeToLeft(){
         if(state==STATE_LEFT) return
         Log.i("HoriGroup","changeToLeft")
         animation(animationCount,0)
         state = STATE_LEFT
     }
 
-    private fun changeToCombine(){
+    public fun changeToCombine(){
         if(state == STATE_COMBINE) return
         Log.i("HoriGroup","changeToCombine")
 
@@ -108,7 +115,7 @@ class HoriGroup(context: Context?) : ViewGroup(context) {
         state = STATE_COMBINE
     }
 
-    private fun animation( start:Int , end:Int){
+    public fun animation( start:Int , end:Int){
         var valueAnimator = ValueAnimator.ofInt(start,end)
         valueAnimator.addUpdateListener(object :ValueAnimator.AnimatorUpdateListener{
 
