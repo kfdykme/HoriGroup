@@ -46,6 +46,10 @@ class HoriGroup  : ViewGroup  {
     var isUse:Boolean? = null
 
 
+    interface onAnimationListener{
+        fun onSuccess()
+    }
+
     constructor(context: Context):super(context){
 
     }
@@ -88,34 +92,38 @@ class HoriGroup  : ViewGroup  {
         velovityTracker!!.computeCurrentVelocity(1000)
         var xVelocity = velovityTracker.getXVelocity()
 
-        if(xVelocity <-slidingDistance){
-            changeToCombine()
-            return true
-        } else if(xVelocity > slidingDistance){
-            changeToLeft()
-            return true
-        } else {
-             return false
-        }
+        dealWithXVelocity(xVelocity,null)
+
         return false
     }
 
-    public fun changeToLeft(){
+    fun dealWithXVelocity(xVelocity :Float,l:onAnimationListener?):Boolean{
+        if(xVelocity <-slidingDistance){
+            changeToCombine(l)
+            return true
+        } else if(xVelocity > slidingDistance){
+            changeToLeft(l)
+            return true
+        }
+            return false
+    }
+
+    public fun changeToLeft(l:onAnimationListener?){
         if(state==STATE_LEFT) return
         Log.i("HoriGroup","changeToLeft")
-        animation(animationCount,0)
+        animation(animationCount,0,l)
         state = STATE_LEFT
     }
 
-    public fun changeToCombine(){
+    public fun changeToCombine(l:onAnimationListener?){
         if(state == STATE_COMBINE) return
         Log.i("HoriGroup","changeToCombine")
 
-        animation(0,animationCount)
+        animation(0,animationCount,l)
         state = STATE_COMBINE
     }
 
-    public fun animation( start:Int , end:Int){
+    public fun animation( start:Int , end:Int,l:onAnimationListener?){
         var valueAnimator = ValueAnimator.ofInt(start,end)
         valueAnimator.addUpdateListener(object :ValueAnimator.AnimatorUpdateListener{
 
@@ -123,6 +131,7 @@ class HoriGroup  : ViewGroup  {
             override fun onAnimationUpdate(animation: ValueAnimator?) {
                 var currentValue:Int = animation?.getAnimatedValue() as Int
 
+                if(currentValue == end ) l?.onSuccess()
 
                 val ex = v * currentValue
 
