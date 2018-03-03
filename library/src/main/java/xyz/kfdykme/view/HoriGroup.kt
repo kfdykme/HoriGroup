@@ -14,17 +14,21 @@ import android.view.ViewGroup
  */
 class HoriGroup  : ViewGroup  {
 
-    val  STATE_LEFT = 0
 
-    val STATE_COMBINE= 1
+    companion object {
+        val  STATE_LEFT = 0
 
-    val DEFAULT_ANIMATION_TIME:Long = 200L
+        val STATE_COMBINE= 1
 
-    val DEFAULT_ANIMATION_COUNT:Int = 100
+        val DEFAULT_ANIMATION_TIME:Long = 200L
 
-    val DEFAULT_WIDTH_RATIO:Float = 3/4f
+        val DEFAULT_ANIMATION_COUNT:Int = 100
 
-    val DeFAULT_SLIDING_DISTANCE:Int = 2000
+        val DEFAULT_WIDTH_RATIO:Float = 3/4f
+
+        val DeFAULT_SLIDING_DISTANCE:Int = 2000
+    }
+
 
     lateinit var leftView:View
     lateinit var rightView:View
