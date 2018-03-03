@@ -52,6 +52,7 @@ class HoriGroup  : ViewGroup  {
 
     interface AnimationListener{
         fun onSuccess(state:Int)
+        fun onStart(state:Int)
     }
 
     var mAnimationListener:AnimationListener? = null
@@ -123,16 +124,17 @@ class HoriGroup  : ViewGroup  {
     public fun changeToLeft(l:AnimationListener?){
         if(state==STATE_LEFT) return
         Log.i("HoriGroup","changeToLeft")
-        animation(animationCount,0,l)
         state = STATE_LEFT
+        animation(animationCount,0,l)
+
     }
 
     public fun changeToCombine(l:AnimationListener?){
         if(state == STATE_COMBINE) return
         Log.i("HoriGroup","changeToCombine")
-
-        animation(0,animationCount,l)
         state = STATE_COMBINE
+        animation(0,animationCount,l)
+
     }
 
     public fun animation( start:Int , end:Int,l:AnimationListener?){
@@ -143,13 +145,14 @@ class HoriGroup  : ViewGroup  {
             override fun onAnimationUpdate(animation: ValueAnimator?) {
                 var currentValue:Int = animation?.getAnimatedValue() as Int
 
-                if(currentValue == end ) l?.onSuccess(state)
+                if(currentValue == start) l?.onStart(state)
 
                 val ex = v * currentValue
-
+                if(currentValue == end -3  ) l?.onSuccess(state)
                 leftView.layout(0,0, leftViewWidth -ex,height)
-                rightView.layout(rightViewWidth -ex,0, rightViewWidth *2-ex,height)
+                rightView.layout(rightViewWidth -ex,0, rightViewWidth +leftViewWidth-ex,height)
                 //    invalidate()
+
             }
         })
         valueAnimator.setDuration(animationTime)
