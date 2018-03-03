@@ -142,13 +142,21 @@ class HoriGroup  : ViewGroup  {
         valueAnimator.addUpdateListener(object :ValueAnimator.AnimatorUpdateListener{
 
             val v:Int = (width * widthRatio /animationCount).toInt()
+            var isEnd:Boolean = false
+            var isStart:Boolean  = false
             override fun onAnimationUpdate(animation: ValueAnimator?) {
                 var currentValue:Int = animation?.getAnimatedValue() as Int
 
-                if(currentValue == start) l?.onStart(state)
+                if(currentValue == start && !isStart){
+                    isStart = true
+                    l?.onStart(state)
+                }
 
                 val ex = v * currentValue
-                if(currentValue == end -3  ) l?.onSuccess(state)
+                if(currentValue >= (end * 0.9) && !isEnd  ){
+                    isEnd = true
+                    l?.onSuccess(state)
+                }
                 leftView.layout(0,0, leftViewWidth -ex,height)
                 rightView.layout(rightViewWidth -ex,0, rightViewWidth +leftViewWidth-ex,height)
                 //    invalidate()
