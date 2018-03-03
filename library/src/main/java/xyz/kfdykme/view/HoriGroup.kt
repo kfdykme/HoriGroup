@@ -8,14 +8,18 @@ import android.view.MotionEvent
 import android.view.VelocityTracker
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 
 /**
  * Created by wimkf on 2018/2/26.
  */
-class HoriGroup  : ViewGroup  {
+class HoriGroup  : RelativeLayout  {
 
 
     companion object {
+
+        val TAG:String = "HoriGroup"
+
         val  STATE_LEFT = 0
 
         val STATE_COMBINE= 1
@@ -96,6 +100,7 @@ class HoriGroup  : ViewGroup  {
             return super.onTouchEvent(event)
         }
 
+
         var velovityTracker:VelocityTracker? = null
         velovityTracker = VelocityTracker.obtain()
 
@@ -105,12 +110,14 @@ class HoriGroup  : ViewGroup  {
         var yVelocity = velovityTracker.getYVelocity()
 
         if(Math.abs(yVelocity) > Math.abs(xVelocity)) return false
-        dealWithXVelocity(xVelocity, mAnimationListener)
+         dealWithXVelocity(xVelocity, mAnimationListener)
+        return true
 
-        return false
     }
 
     fun dealWithXVelocity(xVelocity :Float,l:AnimationListener?):Boolean{
+
+        Log.i(TAG,"dealWithXVelocity $xVelocity")
         if(xVelocity <-slidingDistance){
             changeToCombine(l)
             return true
@@ -118,10 +125,11 @@ class HoriGroup  : ViewGroup  {
             changeToLeft(l)
             return true
         }
-            return false
+
+        return false
     }
 
-    public fun changeToLeft(l:AnimationListener?){
+    fun changeToLeft(l:AnimationListener?){
         if(state==STATE_LEFT) return
         Log.i("HoriGroup","changeToLeft")
         state = STATE_LEFT
@@ -129,7 +137,7 @@ class HoriGroup  : ViewGroup  {
 
     }
 
-    public fun changeToCombine(l:AnimationListener?){
+    fun changeToCombine(l:AnimationListener?){
         if(state == STATE_COMBINE) return
         Log.i("HoriGroup","changeToCombine")
         state = STATE_COMBINE
