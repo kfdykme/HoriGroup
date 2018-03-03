@@ -14,7 +14,7 @@ import android.view.ViewGroup
  */
 class HoriGroup  : ViewGroup  {
 
-    val STATE_LEFT = 0
+    val  STATE_LEFT = 0
 
     val STATE_COMBINE= 1
 
@@ -46,11 +46,15 @@ class HoriGroup  : ViewGroup  {
     var isUse:Boolean? = null
 
 
-    interface onAnimationListener{
+    interface AnimationListener{
         fun onSuccess(state:Int)
     }
 
-    var mOnAnimationListener:onAnimationListener? = null
+    var mAnimationListener:AnimationListener? = null
+
+    fun setAnimationListener(l:AnimationListener){
+        mAnimationListener = l
+    }
 
     constructor(context: Context):super(context){
 
@@ -96,12 +100,12 @@ class HoriGroup  : ViewGroup  {
         var yVelocity = velovityTracker.getYVelocity()
 
         if(Math.abs(yVelocity) > Math.abs(xVelocity)) return false
-        dealWithXVelocity(xVelocity, mOnAnimationListener)
+        dealWithXVelocity(xVelocity, mAnimationListener)
 
         return false
     }
 
-    fun dealWithXVelocity(xVelocity :Float,l:onAnimationListener?):Boolean{
+    fun dealWithXVelocity(xVelocity :Float,l:AnimationListener?):Boolean{
         if(xVelocity <-slidingDistance){
             changeToCombine(l)
             return true
@@ -112,14 +116,14 @@ class HoriGroup  : ViewGroup  {
             return false
     }
 
-    public fun changeToLeft(l:onAnimationListener?){
+    public fun changeToLeft(l:AnimationListener?){
         if(state==STATE_LEFT) return
         Log.i("HoriGroup","changeToLeft")
         animation(animationCount,0,l)
         state = STATE_LEFT
     }
 
-    public fun changeToCombine(l:onAnimationListener?){
+    public fun changeToCombine(l:AnimationListener?){
         if(state == STATE_COMBINE) return
         Log.i("HoriGroup","changeToCombine")
 
@@ -127,7 +131,7 @@ class HoriGroup  : ViewGroup  {
         state = STATE_COMBINE
     }
 
-    public fun animation( start:Int , end:Int,l:onAnimationListener?){
+    public fun animation( start:Int , end:Int,l:AnimationListener?){
         var valueAnimator = ValueAnimator.ofInt(start,end)
         valueAnimator.addUpdateListener(object :ValueAnimator.AnimatorUpdateListener{
 
