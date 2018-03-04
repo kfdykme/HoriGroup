@@ -37,7 +37,7 @@ class HoriGroup  : RelativeLayout  {
     lateinit var leftView:View
     lateinit var rightView:View
 
-    var state:Int = -1
+    var state:Int = STATE_LEFT
 
     var widthRatio:Float = DEFAULT_WIDTH_RATIO
 
