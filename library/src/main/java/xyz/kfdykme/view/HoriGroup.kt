@@ -54,6 +54,10 @@ class HoriGroup  : RelativeLayout  {
     var isUse:Boolean? = null
 
 
+    //
+    var eX:Int = 0
+
+
     interface AnimationListener{
         fun onSuccess(state:Int)
         fun onStart(state:Int)
@@ -89,10 +93,14 @@ class HoriGroup  : RelativeLayout  {
             return
         }
 
-        leftView.layout(0,0, leftViewWidth,height)
-        rightView.layout(leftViewWidth,0, rightViewWidth +leftViewWidth,height)
+        layoutViews()
     }
 
+    private fun layoutViews(){
+        leftView.layout(0,0, leftViewWidth -eX,height)
+        rightView.layout(leftViewWidth-eX,0, rightViewWidth +leftViewWidth-eX,height)
+
+    }
 
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -160,18 +168,20 @@ class HoriGroup  : RelativeLayout  {
                     l?.onStart(state)
                 }
 
-                val ex = v * currentValue
+                eX = v * currentValue
                 if(currentValue >= (end * 0.9) && !isEnd  ){
                     isEnd = true
                     l?.onSuccess(state)
                 }
-                leftView.layout(0,0, leftViewWidth -ex,height)
-                rightView.layout(rightViewWidth -ex,0, rightViewWidth +leftViewWidth-ex,height)
-                //    invalidate()
 
+                layoutViews()
             }
         })
         valueAnimator.setDuration(animationTime)
         valueAnimator.start()
+    }
+
+    fun reflashViews(){
+        layoutViews()
     }
 }
