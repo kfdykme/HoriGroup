@@ -81,7 +81,7 @@ class HoriGroup  : RelativeLayout  {
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         leftViewWidth = width
 
-        rightViewWidth = width
+        rightViewWidth = (width * (1-widthRatio)).toInt()
 
 
         if(childCount == 2){
