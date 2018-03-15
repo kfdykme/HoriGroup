@@ -8,23 +8,31 @@ import android.view.MotionEvent
 import android.view.VelocityTracker
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 
 /**
  * Created by wimkf on 2018/2/26.
  */
-class HoriGroup(context: Context?) : ViewGroup(context) {
+class HoriGroup  : RelativeLayout  {
 
-    val STATE_LEFT = 0
 
-    val STATE_COMBINE= 1
+    companion object {
 
-    val DEFAULT_ANIMATION_TIME:Long = 200L
+        val TAG:String = "HoriGroup"
 
-    val DEFAULT_ANIMATION_COUNT:Int = 100
+        val  STATE_LEFT = 0
 
-    val DEFAULT_WIDTH_RATIO:Float = 3/4f
+        val STATE_COMBINE= 1
 
-    val DeFAULT_SLIDING_DISTANCE:Int = 2000
+        val DEFAULT_ANIMATION_TIME:Long = 200L
+
+        val DEFAULT_ANIMATION_COUNT:Int = 100
+
+        val DEFAULT_WIDTH_RATIO:Float = 3/4f
+
+        val DeFAULT_SLIDING_DISTANCE:Int = 2000
+    }
+
 
     lateinit var leftView:View
     lateinit var rightView:View
@@ -46,7 +54,22 @@ class HoriGroup(context: Context?) : ViewGroup(context) {
     var isUse:Boolean? = null
 
 
-    constructor(context: Context?, attributeSet: AttributeSet):this(context){
+    interface AnimationListener{
+        fun onSuccess(state:Int)
+        fun onStart(state:Int)
+    }
+
+    var mAnimationListener:AnimationListener? = null
+
+    fun setAnimationListener(l:AnimationListener){
+        mAnimationListener = l
+    }
+
+    constructor(context: Context):super(context){
+
+    }
+
+    constructor(context: Context, attributeSet: AttributeSet):super(context,attributeSet){
 
 
     }
@@ -77,51 +100,75 @@ class HoriGroup(context: Context?) : ViewGroup(context) {
             return super.onTouchEvent(event)
         }
 
+
         var velovityTracker:VelocityTracker? = null
         velovityTracker = VelocityTracker.obtain()
 
         velovityTracker!!.addMovement(event)
         velovityTracker!!.computeCurrentVelocity(1000)
         var xVelocity = velovityTracker.getXVelocity()
+        var yVelocity = velovityTracker.getYVelocity()
 
-        if(xVelocity<-slidingDistance)
-            changeToCombine()
-        else if(xVelocity> slidingDistance){
-            changeToLeft()
+        if(Math.abs(yVelocity) > Math.abs(xVelocity)) return false
+         dealWithXVelocity(xVelocity, mAnimationListener)
+        return true
+
+    }
+
+    fun dealWithXVelocity(xVelocity :Float,l:AnimationListener?):Boolean{
+
+        Log.i(TAG,"dealWithXVelocity $xVelocity")
+        if(xVelocity <-slidingDistance){
+            changeToCombine(l)
+            return true
+        } else if(xVelocity > slidingDistance){
+            changeToLeft(l)
+            return true
         }
 
-        return true
+        return false
     }
 
-    private fun changeToLeft(){
+    fun changeToLeft(l:AnimationListener?){
         if(state==STATE_LEFT) return
         Log.i("HoriGroup","changeToLeft")
-        animation(animationCount,0)
         state = STATE_LEFT
+        animation(animationCount,0,l)
+
     }
 
-    private fun changeToCombine(){
+    fun changeToCombine(l:AnimationListener?){
         if(state == STATE_COMBINE) return
         Log.i("HoriGroup","changeToCombine")
-
-        animation(0,animationCount)
         state = STATE_COMBINE
+        animation(0,animationCount,l)
+
     }
 
-    private fun animation( start:Int , end:Int){
+    public fun animation( start:Int , end:Int,l:AnimationListener?){
         var valueAnimator = ValueAnimator.ofInt(start,end)
         valueAnimator.addUpdateListener(object :ValueAnimator.AnimatorUpdateListener{
 
             val v:Int = (width * widthRatio /animationCount).toInt()
+            var isEnd:Boolean = false
+            var isStart:Boolean  = false
             override fun onAnimationUpdate(animation: ValueAnimator?) {
                 var currentValue:Int = animation?.getAnimatedValue() as Int
 
+                if(currentValue == start && !isStart){
+                    isStart = true
+                    l?.onStart(state)
+                }
 
                 val ex = v * currentValue
-
+                if(currentValue >= (end * 0.9) && !isEnd  ){
+                    isEnd = true
+                    l?.onSuccess(state)
+                }
                 leftView.layout(0,0, leftViewWidth -ex,height)
-                rightView.layout(rightViewWidth -ex,0, rightViewWidth *2-ex,height)
+                rightView.layout(rightViewWidth -ex,0, rightViewWidth +leftViewWidth-ex,height)
                 //    invalidate()
+
             }
         })
         valueAnimator.setDuration(animationTime)
